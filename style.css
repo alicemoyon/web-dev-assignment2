@@ -1,0 +1,223 @@
+body {
+	color: #495867;
+	margin: 0;
+	padding: 10px;
+}
+
+
+h1 {
+	text-align: center;
+	font-family: 'Trebuchet MS';
+	text-transform: uppercase;
+	font-size: 30px;
+	font-weight: 100;
+	letter-spacing: 1px;
+}
+
+h3 {
+	font-family: 'Times New Roman';
+	font-size: 30px;
+	letter-spacing: 1px;
+}
+
+h4 {
+	text-transform: capitalize;
+	font-family: 'Times New Roman';
+	font-size: 22px;
+}
+
+p {
+	font-family: 'Arial';
+	line-height: 1.6;
+	color: #495867;
+	font-size: 16px;
+}
+
+#empty-msg {
+	display: none;
+	text-align: center;
+}
+
+/* Styling the search form */
+
+/* to help me style the form elements, I referred to the following resources:
+https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_inline_form
+https://www.w3schools.com/css/css_form.asp */
+
+#search-form {
+	max-width: 1028px;
+	margin: 40px auto 40px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: baseline;
+	padding: 15px;
+	font-family: 'Arial';
+	background-color: #ecc8af;
+	border: 1px solid #ecc8af;
+	border-radius: 4px;
+}
+
+label {
+	margin: 5px;
+}
+
+input {
+	vertical-align: middle;
+	margin: 5px 20px 5px 0;
+	padding: 10px;
+	background-color: #fff;
+	border: 1px solid #fff;
+}
+
+input[type=button] {
+	padding: 4px;
+	font-size: 14px;
+	margin: 10px;
+	margin-left: 50px;
+	font-family: inherit;
+	font-size: 16px;
+	color: inherit;
+	width: 100px;
+	cursor: pointer;
+	border: 1px solid #fff;
+	border-radius: 4px;
+}
+
+input[type=text] {
+	font-size: 16px;
+	width: 40px;
+	padding: 5px;
+	font-family: inherit;
+	color: inherit;
+}
+
+select {
+	appearance: none;
+	color: inherit;
+	font-family: inherit;
+	font-size: 16px;
+	text-transform: capitalize;
+	height: 30px;
+}
+
+#category-options {
+	font-family: inherit;
+}
+
+/* Styling the search results */
+
+#search-results {
+	max-width: 1028px;
+	margin: 0 auto 40px;
+}
+
+.female-winner,
+.male-winner,
+.org-winner {
+	display: block;
+	padding-left: 10px;
+	text-decoration: underline
+}
+
+.female-winner:hover,
+.male-winner:hover,
+.org-winner:hover {
+	color: #ECC8AF;
+	cursor: pointer;
+}
+
+.female-motivation,
+.male-motivation,
+.org-motivation {
+	display: block;
+	padding-left: 30px;
+
+}
+
+/* Styling the more info section */
+
+#more-info {
+	display: none;
+	max-width: 1028px;
+	margin: 20px auto 40px;
+}
+
+#more-info h3 {
+	display: inline;
+	margin-right: 20px;
+}
+
+.nobel {
+	font-weight: 600;
+	letter-spacing: 0.2px;
+	text-transform: capitalize;
+	font-family: 'Times New Roman';
+	font-size: 18px;
+}
+
+h5 {
+	padding-left: 30px;
+	color: #495867;
+	font-family: 'Arial';
+	line-height: 1.6;
+	font-weight: normal;
+	font-size: 16px;
+	font-style: italic;
+}
+
+.motiv-affil {
+	padding-left: 60px;
+}
+
+.award {
+	margin-top: 30px;
+}
+
+.back {
+	font-family: 'Arial';
+	font-style: italic;
+	text-decoration: underline;
+	font-size: small;
+	margin-bottom: 20px;
+}
+
+.back:hover {
+	font-style: italic;
+	cursor: pointer;
+	color: #ECC8AF;
+}
+
+/* Styling the filter section */
+
+#gender-filter {
+	display: none;
+	text-align: center;
+}
+
+
+.radio-option,
+.filter-caption {
+	display: inline-block;
+	padding-left: 20px;
+	font-family: 'Arial';
+	line-height: 1.6;
+	color: #495867;
+	font-size: 16px;
+}
+
+/* I used the following link to help with radio button alignment https://stackoverflow.com/questions/13509883/how-to-vertically-align-a-html-radio-button-to-its-label */
+
+.radio-option input[type="radio"] {
+	margin-top: -1px;
+	margin-right: 2px;
+}
+
+/* Adding a simple line to the footer */
+
+footer {
+	border-top: 2px solid #ECC8AF;
+	margin: 40px auto 40px;
+	width: 200px;
+}

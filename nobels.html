@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Nobel prize info search</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script>
+		var xmlhttp = new XMLHttpRequest();
+		var url = "prizesByYear.json";
+
+		xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+
+				//Parse the JSON data from the first json file to a JavaScript variable. 
+				var parsedObj = JSON.parse(xmlhttp.responseText);
+
+				getJSON(parsedObj);
+			}
+		};
+
+		xmlhttp.open("GET", url, true);
+		xmlhttp.send();
+		//
+		var xmlhttp2 = new XMLHttpRequest();
+		var url2 = "winnersByID.json";
+
+		xmlhttp2.onreadystatechange = function() {
+			if (xmlhttp2.readyState === 4 && xmlhttp2.status === 200) {
+
+				// Parse the JSON data from the second json file to a second JavaScript variable. 
+				var parsedObj2 = JSON.parse(xmlhttp2.responseText);
+
+				getJSON2(parsedObj2);
+			}
+		};
+		xmlhttp2.open("GET", url2, true);
+		xmlhttp2.send();
+
+	</script>
+</head>
+
+
+<body>
+
+
+	<header>
+		<h1>Nobel Prize Info Search</h1>
+	</header>
+
+	<script>
+		function getJSON(obj) {
+			// Defined as a global variable so it can be accessed in other functions later
+			prizesArray = obj.prizes;
+
+			// This code iterates through prizesArray and writes html code to populate the search form categry drop down
+			var prizeCategoryOption = '<option value="none">Please select</option>';
+			for (var i = 0; i < prizesArray.length; i++) {
+				prizeCategory = prizesArray[i].category;
+				if (prizeCategoryOption.includes(prizeCategory) === false) {
+					prizeCategoryOption += "<option value='" + prizeCategory + "'>" + prizeCategory + "</option>";
+				}
+			}
+
+			document.getElementById("category-options").innerHTML = prizeCategoryOption;
+		}
+
+		function getJSON2(obj) {
+			// Defined as a global variable so it can be accessed in other functions later
+			laureatesArray = obj.laureates;
+		}
+
+	</script>
+
+	<div class="search-form-wrapper">
+		<form id="search-form">
+			<label>Year from (required):</label>
+			<input type="text" id="year-from" required>
+			<br><br>
+			<label>Year to (required):</label>
+			<input type="text" id="year-to" required>
+			<br><br>
+			<label>Prize category (optional):</label>
+			<select id="category-options" name="category">
+			</select>
+			<br><br>
+			<input type="button" name="submit" value="Submit" onclick="processForm()">
+		</form>
+	</div>
+
+	<div id="gender-filter">
+		<p class="filter-caption">Filter the results to show:</p>
+		<div class="radio-option">
+			<input id="all" type="radio" name="gender" value="all" onclick="filterGender('all')" checked> All winners
+		</div>
+		<div class=radio-option>
+			<input type="radio" name="gender" value="female" onclick="filterGender('female')"> Only female winners
+		</div>
+		<div class="radio-option">
+			<input type="radio" name="gender" value="male" onclick="filterGender('male')"> Only male winners
+		</div>
+	</div>
+
+	<script>
+		// This function is executed when the user clicks the submit button on the search form. It collects the values entered in the search form and calls the validation function.
+		function processForm() {
+			var form = document.getElementById("search-form");
+			var yearFrom = document.getElementById("year-from").value;
+			var yearTo = document.getElementById("year-to").value;
+			var categorySelected = document.getElementById("category-options").value;
+			yearFrom = Number(yearFrom);
+			yearTo = Number(yearTo);
+			// Calling form validation function
+			validateForm(yearFrom, yearTo, categorySelected);
+		};
+
+		function validateForm(yearFrom, yearTo, categorySelected) {
+			;
+			var maxYear = Number(prizesArray[0].year);
+			var minYear = Number(prizesArray[prizesArray.length - 1].year);
+
+			if (isNaN(yearFrom) || isNaN(yearTo)) {
+				alert('Error: Years must be numbers');
+			} else if (yearFrom === 0 || yearTo === 0) {
+				alert('Error: Both years are required. Please enter Year from and Year to');
+			} else if (yearFrom < minYear || yearTo > maxYear) {
+				alert('Error: Years must be between 1970 and 2018');
+			} else if (yearFrom > yearTo) {
+				alert('Error: Year from field must be less than Year to field');
+			} else {
+				// Calling the function that will perform the search and display the results
+				getResults(yearFrom, yearTo, categorySelected);
+			}
+		};
+
+		function getResults(yearFrom, yearTo, categorySelected) {
+			var resultsDisplay = "";
+			var catToDisplay = "";
+			for (var i = yearFrom; i < yearTo + 1; i++) {
+				// Building each award year html element
+				yearToDisplay = i;
+				resultsDisplay += "<h3 class='year'>" + yearToDisplay + "</h3>";
+				yearToSearch = yearToDisplay.toString();
+				// Retrieving category and winner data for each year
+				for (var j = 0; j < prizesArray.length; j++) {
+					if (prizesArray[j].year === yearToSearch && (categorySelected === 'none' || categorySelected === prizesArray[j].category)) {
+						catToDisplay = prizesArray[j].category;
+						resultsDisplay += "<h4 class='category'>" + catToDisplay + "</h4>";
+						for (var n = 0; n < prizesArray[j].laureates.length; n++) {
+							var laureateFirstName = prizesArray[j].laureates[n].firstname;
+							var laureateLastName = prizesArray[j].laureates[n].surname;
+							var laureateId = prizesArray[j].laureates[n].id;
+							var laureateGender = "";
+
+							if (typeof prizesArray[j].laureates[n].motivation === "undefined" && typeof prizesArray[j].overallMotivation === "undefined") {
+								laureateMotivation = 'motivation for the award is unknown';
+							} else if (prizesArray[j].laureates[n].motivation === "" && prizesArray[j].overallMotivation !== "")
+								laureateMotivation = prizesArray[j].overallMotivation;
+							else {
+								laureateMotivation = prizesArray[j].laureates[n].motivation;
+							}
+							
+							// Getting the laureate gender
+							for (var z = 0; z < laureatesArray.length; z++) {
+								if (laureatesArray[z].id === laureateId) {
+									if (typeof laureatesArray[z].gender === "undefined") {
+										laureateGender = 'none';
+									} else {
+										laureateGender = laureatesArray[z].gender;
+									}
+								}
+							}
+
+							resultsDisplay += "<p class='" + laureateGender + "-winner' onclick=\"moreInfo(" + laureateId + ")\">" + laureateFirstName + " " + laureateLastName + "</p><p class='" + laureateGender + "-motivation'>" + laureateMotivation + "</p>";
+						}
+					}
+				}
+			}
+			// Displaying the results
+			document.getElementById("search-results").innerHTML = resultsDisplay;
+			document.getElementById("search-results").style.display = 'block';
+			// Making the gender selection radio buttons visible (and resetting default checked button in case it is not the first time that the form is submitted in the user session)
+			document.getElementById("all").checked = true;
+			document.getElementById("gender-filter").style.display = 'block';
+			// Hiding other sections
+			document.getElementById("more-info").style.display = 'none';
+			document.getElementById("empty-msg").style.display = 'none';
+
+		}
+
+
+		// Function that filters the results by gender
+		// Winners of any other gender than male or female (including 'org' and undefined) are included in both the male and the female selection.
+		function filterGender(filterValue) {
+			var femaleWinners = document.getElementsByClassName("female-winner");
+			var maleWinners = document.getElementsByClassName("male-winner");
+			var femaleWinnerMotivations = document.getElementsByClassName("female-motivation");
+			var maleWinnerMotivations = document.getElementsByClassName("male-motivation");
+			var displayedYears = document.getElementsByClassName("year");
+			var displayedCategories = document.getElementsByClassName("category");
+			document.getElementById("empty-msg").style.display = 'none';
+			// Resetting the display values of years and categories, for cases where they had been hidden before (i.e. no females or no males cases below)
+			for (var z = 0; z < displayedYears.length; z++) {
+				displayedYears[z].style.display = 'block';
+			}
+			for (var w = 0; w < displayedCategories.length; w++) {
+				displayedCategories[w].style.display = 'block';
+			}
+
+			// Filtering results displayed based on gender radio button selection
+			// Any gender property that's neither male nor female (e.g. an organisation) will display for all selections
+			if (filterValue === 'male') {
+				for (var i = 0; i < femaleWinners.length; i++) {
+					femaleWinners[i].style.display = 'none';
+					femaleWinnerMotivations[i].style.display = 'none';
+				}
+				for (var j = 0; j < maleWinners.length; j++) {
+					maleWinners[j].style.display = 'block';
+					maleWinnerMotivations[j].style.display = 'block';
+				}
+				// Dealing with cases where there are no male winners in the selected years and categories
+				if (maleWinners.length === 0) {
+					for (var z = 0; z < displayedYears.length; z++) {
+						displayedYears[z].style.display = 'none';
+					}
+					for (var w = 0; w < displayedCategories.length; w++) {
+						displayedCategories[w].style.display = 'none';
+					}
+					var maleEmptyMsg = "<p>No male winners. Try selecting different years or categories</p>";
+					document.getElementById("empty-msg").innerHTML = maleEmptyMsg;
+					document.getElementById("empty-msg").style.display = 'block';
+				}
+
+
+			} else if (filterValue === 'female') {
+				for (var i = 0; i < femaleWinners.length; i++) {
+					femaleWinners[i].style.display = 'block';
+					femaleWinnerMotivations[i].style.display = 'block';
+				}
+				for (var j = 0; j < maleWinners.length; j++) {
+					maleWinners[j].style.display = 'none';
+					maleWinnerMotivations[j].style.display = 'none';
+				}
+				// dealing with cases where there are no male winners in the selected years and categories
+				if (femaleWinners.length === 0) {
+					for (var z = 0; z < displayedYears.length; z++) {
+						displayedYears[z].style.display = 'none';
+					}
+					for (var w = 0; w < displayedCategories.length; w++) {
+						displayedCategories[w].style.display = 'none';
+					}
+					var femaleEmptyMsg = "<p>No female winners. Try selecting different years or categories</p>";
+					document.getElementById("empty-msg").innerHTML = femaleEmptyMsg;
+					document.getElementById("empty-msg").style.display = 'block';
+				}
+			} else {
+				for (var i = 0; i < femaleWinners.length; i++) {
+					femaleWinners[i].style.display = 'block';
+					femaleWinnerMotivations[i].style.display = 'block';
+				}
+				for (var j = 0; j < maleWinners.length; j++) {
+					maleWinners[j].style.display = 'block';
+					maleWinnerMotivations[j].style.display = 'block';
+				}
+
+			}
+
+		}
+
+		// This function is executed when a user clicks on a winner's name
+		// and displays additional information about the winner
+		function moreInfo(winnerId) {
+
+			document.getElementById("gender-filter").style.display = 'none';
+			var results = document.getElementById("search-results");
+			results.style.display = 'none';
+			var info = document.getElementById("more-info");
+			info.style.display = 'block';
+			var infoDisplay = "";
+
+			// Locating index of winnerId
+			winnerId = winnerId.toString();
+			// I found this code snippet (just the next line) on stackoverflow (https://stackoverflow.com/questions/15997879/get-the-index-of-the-object-inside-an-array-matching-a-condition). 
+			var winnerIndex = laureatesArray.findIndex(x => x.id === winnerId);
+
+			// Retrieving information to display for this winner
+			var firstName = laureatesArray[winnerIndex].firstname;
+			var lastName = laureatesArray[winnerIndex].surname;
+			if (typeof lastName === "undefined") {
+				infoDisplay += "<h3>" + firstName + "</h3>";
+			} else {
+				infoDisplay += "<h3>" + firstName + " " + lastName + "</h3>";
+			}
+			infoDisplay += "<span class='back' onclick='backToResults()'>back to results</span>"
+			var birthCity = laureatesArray[winnerIndex].bornCity;
+			var birthYear = laureatesArray[winnerIndex].born.substring(0, 4);
+			if (laureatesArray[winnerIndex].died === "0000-00-00" && laureatesArray[winnerIndex].born === "0000-00-00") {
+				infoDisplay += "<br>";
+			} else if (laureatesArray[winnerIndex].died === "0000-00-00" && laureatesArray[winnerIndex].born !== "0000-00-00") {
+				infoDisplay += "<p>Born: " + birthYear + " in " + birthCity + "</p>";
+			} else {
+				var deathYear = laureatesArray[winnerIndex].died.substring(0, 4);
+				infoDisplay += "<p>Born: " + birthYear + " in " + birthCity + ". " + "Died: " + deathYear + "</p>";
+			}
+			infoDisplay += "<p class='award'>Award(s) received:<p>";
+			var awardCat;
+			var awardMotiv;
+			var affName;
+			var affCity;
+			var affCountry;
+			for (var i = 0; i < laureatesArray[winnerIndex].prizes.length; i++) {
+				awardCat = laureatesArray[winnerIndex].prizes[i].category
+				awardYear = laureatesArray[winnerIndex].prizes[i].year
+				if (typeof laureatesArray[winnerIndex].prizes[i].motivation === "undefined") {
+					awardMotiv = "unknown";
+				} else {
+					awardMotiv = laureatesArray[winnerIndex].prizes[i].motivation
+				}
+				infoDisplay += "<p class='nobel'>Nobel prize in " + awardCat + " (" + awardYear + ")</p>";
+				infoDisplay += "<h5>Motivation for the award:</h5><p class='motiv-affil'>" + awardMotiv + "</p>";
+				infoDisplay += "<h5>Affiliation(s):</h5>";
+				for (var j = 0; j < laureatesArray[winnerIndex].prizes[i].affiliations.length; j++) {
+					if (laureatesArray[winnerIndex].prizes[i].affiliations[j].length != 0) {
+						affName = laureatesArray[winnerIndex].prizes[i].affiliations[j].name;
+						affCity = laureatesArray[winnerIndex].prizes[i].affiliations[j].city;
+						affCountry = laureatesArray[winnerIndex].prizes[i].affiliations[j].country;
+						infoDisplay += "<p class='motiv-affil'>" + affName + ", " + affCity + " in " + affCountry + "</p>";
+					} else {
+						infoDisplay += "<p class='motiv-affil'>not affiliated</p>";
+					}
+				}
+			}
+			document.getElementById("more-info").innerHTML = infoDisplay;
+
+		};
+
+		// This function is executed when the user click on back to results
+		function backToResults() {
+			document.getElementById("more-info").style.display = 'none';
+			document.getElementById("search-results").style.display = 'block';
+			document.getElementById("gender-filter").style.display = 'block';
+		}
+
+	</script>
+
+	<div id="more-info"></div>
+	<div id="search-results"></div>
+	<div id="empty-msg"></div>
+
+	<footer></footer>
+
+</body>
